@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 import cv2
-from utils import get_device
+from old.utils import get_device
 
 # Couleur par classe
 CLASS_COLORS = {

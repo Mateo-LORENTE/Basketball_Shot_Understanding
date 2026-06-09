@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from utils import get_device
+from old.utils import get_device
 
 class ShotDetector:
     def __init__(self):

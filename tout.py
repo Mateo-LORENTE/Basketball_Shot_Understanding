@@ -1,11 +1,13 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from utils import get_device
+import torch
 from collections import defaultdict
 import pandas as pd
 import os
-
+import itertools
+import random
+from pathlib import Path
 
 def euclidean(c1, c2):
     return np.linalg.norm(np.array(c1) - np.array(c2))
@@ -15,6 +17,17 @@ def euclidean(c1, c2):
 def bbox_center(bbox):
     x, y, w, h = bbox[:4]
     return (x + w / 2, y + h / 2)
+
+
+def get_device():
+    """Automatically select devices -> mps Mac -> cpu"""
+    if torch.cuda.is_available():
+        device = 'cuda'
+    elif torch.backends.mps.is_available():
+        device = 'mps'
+    else:
+        device = 'cpu'
+    return device
 
 
 
@@ -42,6 +55,12 @@ KEYPOINT_EDGES = [
     (11, 13), (13, 15), (12, 14), (14, 16),
 ]
 
+# video_dir = Path("video")
+# mp4_files = list(video_dir.glob("*.mp4"))
+# if not mp4_files:
+#     raise FileNotFoundError("Aucun fichier .mp4 trouvé dans le dossier video")
+# VIDEO_PATH = str(mp4_files[0])
+
 class ShotDetector:
     def __init__(self):
         self.model_ball = YOLO("Yolo/big.pt")
@@ -56,7 +75,9 @@ class ShotDetector:
         self.poses = {}
 
         self.group_timeout = 15
-        self.group_threshold = 30
+        self.group_threshold = 20
+        self.JUMP_THRESHOLD = 35
+        #$
         #$
 
         self.forward_track = {}
@@ -70,9 +91,6 @@ class ShotDetector:
         self.export_data()
         self.display()
 
-    # -----------------------------------------------------------------------
-    # Helpers
-    # -----------------------------------------------------------------------
     def _ball_center(self, bbox):
         x, y, w, h, _ = bbox
         return (x + w / 2, y + h / 2)
@@ -100,22 +118,81 @@ class ShotDetector:
 
     #$
     # -----------------------------------------------------------------------
-    def brighten(self, frame, alpha=1.3, beta=60):
+    def brighten(self, frame, alpha, beta):
         return cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+    
+    def sum_confidences(self,model_ball, frame, device):
+        brightened = self.brighten(frame, alpha=1.0, beta=0)  
+        results_ball = model_ball(brightened, device=device)
+
+        total_conf = 0.0
+        for box in results_ball[0].boxes:
+            conf = float(box.conf[0])
+            total_conf += conf
+        return total_conf
+    
+    def find_optimal_alpha_beta(self,cap, model_ball, device, num_frames=100):
+        if not cap.isOpened():
+            raise ValueError("Impossible d'ouvrir la vidéo.")
+
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if total_frames < num_frames:
+            num_frames = total_frames
+
+        # Sélectionner 50 frames aléatoires (les mêmes pour tous les couples)
+        frame_indices = random.sample(range(total_frames), num_frames)
+        frames = []
+        for idx in frame_indices:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
+            ret, frame = cap.read()
+            if ret:
+                frames.append(frame)
+
+        # Valeurs à tester
+        alpha_values = [1.0, 1.2, 1.5, 1.7, 2.0]
+        beta_values = [0, 15, 30, 45, 60]
+
+        best_alpha, best_beta = 1.0, 0
+        best_total_conf = -1
+
+        # Tester toutes les combinaisons
+        for alpha, beta in itertools.product(alpha_values, beta_values):
+            total_conf = 0.0
+            for frame in frames:
+                brightened = self.brighten(frame, alpha=alpha, beta=beta)
+                results_ball = model_ball(brightened, device=device)
+
+                # Calculer la somme des confiances pour cette frame
+                frame_conf = 0.0
+                for box in results_ball[0].boxes:
+                    conf = float(box.conf[0])
+                    frame_conf += conf
+                total_conf += frame_conf
+
+            # Mettre à jour les meilleurs paramètres
+            if total_conf > best_total_conf:
+                best_total_conf = total_conf
+                best_alpha, best_beta = alpha, beta
+
+            print(f"alpha={alpha}, beta={beta} -> Total conf: {total_conf:.2f}")
+
+        print(f"\nMeilleurs paramètres : alpha={best_alpha}, beta={best_beta} (Total conf: {best_total_conf:.2f})")
+        return best_alpha, best_beta
 
     # -----------------------------------------------------------------------
     def load_video_and_detect(self):
         frame_id = 0
         raw_balls = {}
-
+        alpha_best , beta_best = self.find_optimal_alpha_beta(self.cap,self.model_ball,self.device)
+        self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
         while True:
             ret, frame = self.cap.read()
             if not ret:
                 break
 
             self.frames.append(frame)
-            brightened = frame
-            #brightened = self.brighten(frame)
+            
+            brightened = self.brighten(frame,alpha_best,beta_best)
 
             results_ball = self.model_ball(brightened, device=self.device)
 
@@ -290,7 +367,7 @@ class ShotDetector:
         return None
 
     # -------------------------------
-    # 🟩 Groupement sur la décision
+    # Groupement sur la décision
     # -------------------------------
     def build_groups_on_decision(self):
         """
@@ -306,8 +383,7 @@ class ShotDetector:
         last_center = None
         last_det_count = 0
         detection_count = 0
-        JUMP_THRESHOLD = 35
-        #$
+        
 
         for frame_id in range(len(self.frames)):
             bbox = self.get_decision_bbox(frame_id)
@@ -330,7 +406,7 @@ class ShotDetector:
                 if gap > self.group_timeout:
                     is_jump = True
                 else:
-                    is_jump = euclidean(center, last_center) > JUMP_THRESHOLD
+                    is_jump = euclidean(center, last_center) > self.JUMP_THRESHOLD
 
             if not is_jump and current_group is not None:
                 # Mouvement continu → même groupe
@@ -406,7 +482,7 @@ class ShotDetector:
             cv2.line(frame, (int(xa), int(ya)), (int(xb), int(yb)), (0, 200, 255), 2)
 
     # -----------------------------------------------------------------------
-    # 🚫 Suppression des groupes collés à un keypoint personne
+    # Suppression des groupes collés à un keypoint personne
     # -----------------------------------------------------------------------
     PERSON_KP_INDICES = [0, 1, 2, 3, 4, 9, 10, 15, 16]   # tête(nez), cheville gauche, cheville droite
     PERSON_KP_TOLERANCE = 15          # px — "correspond à" un keypoint
@@ -487,7 +563,7 @@ class ShotDetector:
     def export_data(self):
         os.makedirs("DATA", exist_ok=True)
 
-        # ── 1. BALLE
+        # BALLE
         ball_rows = []
         for fid in range(len(self.frames)):
             bbox = self.get_decision_bbox(fid)
@@ -543,7 +619,7 @@ class ShotDetector:
                 })
         pd.DataFrame(hoop_rows).to_csv("DATA/hoop.csv", index=False)
 
-        # ── 3. POSE
+        # POSE
         pose_rows = []
         for fid in range(len(self.frames)):
             persons = self.poses.get(fid, [])
@@ -573,7 +649,7 @@ class ShotDetector:
         pd.DataFrame(pose_rows).to_csv("DATA/poses.csv", index=False)
         print(f"[EXPORT] poses.csv → {len(pose_rows)} lignes")
 
-        # ── 4. GROUPES
+        # GROUPES
         group_rows = []
         for g in self.groups:
             group_rows.append({
@@ -602,7 +678,7 @@ class ShotDetector:
             hoop = self.hoops.get(i)
 
             # ---------------------------
-            # 🟡 HOOP (panier)
+            # HOOP (panier)
             # ---------------------------
             if hoop is not None:
                 x, y, w, h, conf = hoop
@@ -611,34 +687,34 @@ class ShotDetector:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 215, 255), 2)
 
             # ---------------------------
-            # 🧍 POSES (points + squelette)
+            # POSES (points + squelette)
             # ---------------------------
             for (kps, confs) in self.poses.get(i, []):
                 self.draw_pose(frame, kps, confs)
 
             # ---------------------------
-            # 🔵 YOLO (détection brute)
+            # YOLO (détection brute)
             # ---------------------------
             if det is not None:
                 x, y, w, h, conf = det
                 cv2.rectangle(frame, (int(x), int(y)), (int(x+w), int(y+h)), (255, 0, 0), 2)
 
             # ---------------------------
-            # 🟢 Forward tracking
+            # Forward tracking
             # ---------------------------
             if f is not None:
                 x, y, w, h = map(int, f)
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 1)
 
             # ---------------------------
-            # 🟣 Backward tracking
+            # Backward tracking
             # ---------------------------
             if b is not None:
                 x, y, w, h = map(int, b)
                 cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 255), 1)
 
             # ---------------------------
-            # 🎯 Décision + GROUPES
+            # Décision + GROUPES
             # ---------------------------
             decision_bbox = self.get_decision_bbox(i)
             group_id = self.frame_to_group.get(i)
@@ -658,7 +734,7 @@ class ShotDetector:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.65, color, 2)
 
             # ---------------------------
-            # 📊 Légende groupes
+            # Légende groupes
             # ---------------------------
             for idx, g in enumerate(self.groups):
                 c = get_group_color(g['id'])
@@ -669,7 +745,7 @@ class ShotDetector:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, c, 1)
 
             # ---------------------------
-            # 📉 Bandeau bas
+            # Bandeau bas
             # ---------------------------
             bar_h = 50
             overlay = frame.copy()
@@ -689,7 +765,7 @@ class ShotDetector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.65, (255, 255, 255), 2)
 
             # ---------------------------
-            # 🎬 SHOW
+            # SHOW
             # ---------------------------
             cv2.imshow("ShotDetector - Full Debug", frame)
 
