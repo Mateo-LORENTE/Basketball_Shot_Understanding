@@ -2,6 +2,9 @@
 
 An end-to-end computer vision pipeline that takes raw basketball footage and automatically detects, tracks, and classifies every shot attempt as made or missed.
 
+|[shot detection](docs/exemple/video_annotated.gif)
+
+
 ## How it works
 
 **1. Auto-crop**
