@@ -8,7 +8,7 @@ An end-to-end computer vision pipeline that takes raw basketball footage and aut
 ## Usage
 
 ```bash
-git clone https://github.com/yourusername/basketball-shot-detector.git
+git clone https://github.com/Mateo-LORENTE/Basketball_Shot_Understanding
 ```
 
 Drop your video into the `VID_IN/` folder, run 
