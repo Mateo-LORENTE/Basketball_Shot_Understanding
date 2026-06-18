@@ -1,6 +1,18 @@
+
 # Basketball Shot Detector
 
 An end-to-end computer vision pipeline that takes raw basketball footage and automatically detects, tracks, and classifies every shot attempt as made or missed.
+
+<img width="480" height="848" alt="exemple" src="https://github.com/user-attachments/assets/854c63ec-430c-4234-be89-5bfaa8c895a6" />
+
+## Usage
+
+```bash
+git clone https://github.com/yourusername/basketball-shot-detector.git
+```
+
+Drop your video into the `VID_IN/` folder, run the pipeline, and find the annotated result in `VID_OUT/`.
+
 
 ## How it works
 
@@ -24,10 +36,4 @@ Each detected trajectory is analyzed geometrically relative to the hoop position
 
 The final output is the original video annotated with the ball, hoop, player pose, and a live shot counter (made/total) overlaid in real time.
 
-## Usage
 
-```bash
-git clone https://github.com/yourusername/basketball-shot-detector.git
-```
-
-Drop your video into the `VID_IN/` folder, run the pipeline, and find the annotated result in `VID_OUT/`.
