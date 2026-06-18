@@ -6,7 +6,7 @@ import cv2
 import os
 
 class ShotStatistics:
-    def __init__(self, ball_csv="DATA_/ball.csv", hoop_csv="DATA_/hoop.csv", poses_csv="DATA_/poses.csv", video_path="VID_IN/out.mp4", OFFSET_X=0, OFFSET_Y=0):
+    def __init__(self, ball_csv="DATA_extracted/ball.csv", hoop_csv="DATA_extracted/hoop.csv", poses_csv="DATA_extracted/poses.csv", video_path="VID_IN/out.mp4", OFFSET_X=0, OFFSET_Y=0):
         """
         Initializes shot analysis using CSV data and video input.
 

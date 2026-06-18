@@ -30,9 +30,9 @@ if __name__ == "__main__":
 
     #Analyse trajectory of the ball and player movement to understand the video
     statistics = ShotStatistics(
-        ball_csv="DATA_/ball.csv",
-        hoop_csv="DATA_/hoop.csv",
-        poses_csv="DATA_/poses.csv",
+        ball_csv="DATA_extracted/ball.csv",
+        hoop_csv="DATA_extracted/hoop.csv",
+        poses_csv="DATA_extracted/poses.csv",
         video_path=first_video,
         OFFSET_X=x1,
         OFFSET_Y=y1

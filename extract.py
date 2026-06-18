@@ -568,7 +568,7 @@ class ShotDetector:
                     "yolo_conf": None,
                     "group_id":  None,
                 })
-        pd.DataFrame(ball_rows).to_csv("DATA_/ball.csv", index=False)
+        pd.DataFrame(ball_rows).to_csv("DATA_extracted/ball.csv", index=False)
         print(f"[EXPORT] ball.csv → {len(ball_rows)} frames")
 
         hoop_rows = []
@@ -591,7 +591,7 @@ class ShotDetector:
                     "w": None, "h": None,
                     "conf": None,
                 })
-        pd.DataFrame(hoop_rows).to_csv("DATA_/hoop.csv", index=False)
+        pd.DataFrame(hoop_rows).to_csv("DATA_extracted/hoop.csv", index=False)
 
         # POSE
         pose_rows = []
@@ -620,7 +620,7 @@ class ShotDetector:
                             row[f"{name}_y"]    = None
                             row[f"{name}_conf"] = None
                     pose_rows.append(row)
-        pd.DataFrame(pose_rows).to_csv("DATA_/poses.csv", index=False)
+        pd.DataFrame(pose_rows).to_csv("DATA_extracted/poses.csv", index=False)
         print(f"[EXPORT] poses.csv → {len(pose_rows)} lignes")
 
         # GROUPES
@@ -634,10 +634,10 @@ class ShotDetector:
                 "last_cx":     round(g["last_center"][0], 2),
                 "last_cy":     round(g["last_center"][1], 2),
             })
-        pd.DataFrame(group_rows).to_csv("DATA_/groups.csv", index=False)
+        pd.DataFrame(group_rows).to_csv("DATA_extracted/groups.csv", index=False)
         print(f"[EXPORT] groups.csv → {len(group_rows)} groups")
 
-        print("[EXPORT] ✅ → folder DATA_/")
+        print("[EXPORT] ✅ → folder DATA_extracted/")
 
 
 #Helpers
