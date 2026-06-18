@@ -214,15 +214,22 @@ class ShotStatistics:
         return entry == "top" and exit == "bottom"
 
 
-    def plot_shoot(self, traj, shoot_start):
-        """Displays the shot trajectory and hoop location."""
+
+    def plot_shoot(self,traj, hoop_w=30, hoop_h=30):
         plt.figure(figsize=(8, 6))
         plt.plot(traj["cx"], traj["cy"], marker="o", markersize=2, label="balle")
         plt.scatter(self.HOOP_CX, self.HOOP_CY, color="red", s=100, zorder=5, label="panier")
+
+        hx = self.HOOP_CX - hoop_w / 2
+        hy = self.HOOP_CY - hoop_h / 2
+        plt.gca().add_patch(
+            plt.Rectangle((hx, hy), hoop_w, hoop_h, fill=False, edgecolor="red", linewidth=2)
+        )
+
         plt.gca().invert_yaxis()
         plt.legend()
-        plt.title(f"Trajectoire du tir (frame {shoot_start})")
         plt.show()
+
 
     def analyze_shoots(self):
         """Analyzes all detected shots and displays the results."""
