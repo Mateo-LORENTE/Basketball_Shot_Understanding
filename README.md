@@ -1,8 +1,11 @@
+
 # Basketball Shot Detector
 
 An end-to-end computer vision pipeline that takes raw basketball footage and automatically detects, tracks, and classifies every shot attempt as made or missed.
 
-|[shot detection](docs/exemple/video_annotated.gif)
+<img width="480" height="848" alt="exemple gif" src="https://github.com/user-attachments/assets/c2ed2f6f-c93d-4208-9a4e-6209b4735a45" />
+
+
 
 
 ## How it works
