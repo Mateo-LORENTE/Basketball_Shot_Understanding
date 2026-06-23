@@ -26,13 +26,6 @@ python shot_analysis.py
 ```
 in terminal, and find the annotated result in `VID_OUT/`.
 
-## Project Structure
-Basketball_Shot_Understanding/
-├── VID_IN/          # Drop your input videos here
-├── VID_OUT/         # Annotated output videos
-├── shot_analysis.py # Main pipeline
-├── requirements.txt
-└── models/          # YOLO weights
 
 ## How it works
 
