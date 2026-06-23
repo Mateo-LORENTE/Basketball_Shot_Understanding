@@ -1,7 +1,9 @@
 
 # Basketball Shot Detector
 
-An end-to-end computer vision pipeline that takes raw basketball footage and automatically detects, tracks, and classifies every shot attempt as made or missed.
+An end-to-end computer vision pipeline that takes raw basketball footage and automatically detects, tracks, and classifies every shot attempt as made or missed. ![Python](https://img.shields.io/badge/Python-3.10-blue)
+![YOLOv8](https://img.shields.io/badge/YOLO-v8-darkgreen)
+![OpenCV](https://img.shields.io/badge/OpenCV-4.x-red)
 
 <img width="480" height="848" alt="exemple" src="https://github.com/user-attachments/assets/854c63ec-430c-4234-be89-5bfaa8c895a6" />
 
