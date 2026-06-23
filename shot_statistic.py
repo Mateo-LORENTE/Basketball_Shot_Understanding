@@ -245,7 +245,7 @@ class ShotStatistics:
             if shot_made:
                 made += 1
             print(f"[SHOT STATISTICS] Shot at frame {shoot_start} : {'Scored' if shot_made else 'Missed'}")
-            self.plot_shoot(traj, shoot_start)
+            #self.plot_shoot(traj, shoot_start)
 
         print(f"[SHOT STATISTICS] Resultats : {made}/{total} shot made.")
         return shoot_results
