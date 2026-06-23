@@ -9,6 +9,8 @@ An end-to-end computer vision pipeline that takes raw basketball footage and aut
 
 ## Usage
 
+- Python 3.10+
+
 ```bash
 git clone https://github.com/Mateo-LORENTE/Basketball_Shot_Understanding
 ```
