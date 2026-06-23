@@ -47,10 +47,10 @@ The final output is the original video annotated with the ball, hoop, player pos
 
 ## Technologies
 
-- **YOLOv8** — object detection model used for ball detection, fine-tuned on a custom basketball dataset sourced from Roboflow and trained via a dedicated Colab notebook (`.ipynb`)
+- **YOLOv8** — object detection model used for ball detection, fine-tuned on a custom basketball dataset sourced from Roboflow and trained.
 - **YOLOv11n-pose** — lightweight pose estimation model used to extract body keypoints (shoulders, elbows, wrists, hips, knees) for shot mechanics analysis
 - **OpenCV** — handles video I/O, frame preprocessing (brightness adjustment, drawing overlays), and output video rendering
-- **TrackerCSRT** — OpenCV's CSRT tracker used to maintain ball tracking between frames when YOLO detection confidence is low or the ball is temporarily occluded
+- **TrackerCSRT** — OpenCV's CSRT tracker used to maintain ball tracking between frames when YOLO detection confidence is low or the ball is temporarily occluded
 
 ## Limitations
 
