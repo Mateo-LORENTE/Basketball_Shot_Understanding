@@ -45,6 +45,13 @@ Each detected trajectory is analyzed geometrically relative to the hoop position
 
 The final output is the original video annotated with the ball, hoop, player pose, and a live shot counter (made/total) overlaid in real time.
 
+## Technologies
+
+- **YOLOv8** — object detection model used for ball detection, fine-tuned on a custom basketball dataset sourced from Roboflow and trained via a dedicated Colab notebook (`.ipynb`)
+- **YOLOv11n-pose** — lightweight pose estimation model used to extract body keypoints (shoulders, elbows, wrists, hips, knees) for shot mechanics analysis
+- **OpenCV** — handles video I/O, frame preprocessing (brightness adjustment, drawing overlays), and output video rendering
+- **TrackerCSRT** — OpenCV's CSRT tracker used to maintain ball tracking between frames when YOLO detection confidence is low or the ball is temporarily occluded
+
 ## Limitations
 
 - **Processing speed:** Execution time is approximately 10× slower than real-time (1 minute of video takes ~10 minutes to process) on a CPU-only setup (6 threads, no GPU), making long videos computationally intensive. Performance will vary depending on hardware.
