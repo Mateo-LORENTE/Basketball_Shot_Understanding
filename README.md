@@ -47,7 +47,7 @@ The final output is the original video annotated with the ball, hoop, player pos
 
 ## Limitations
 
-- **Processing speed:** Execution time is approximately 10× slower than real-time (1 minute of video takes ~10 minutes to process), making long videos computationally intensive
+- **Processing speed:** Execution time is approximately 10× slower than real-time (1 minute of video takes ~10 minutes to process) on a CPU-only setup (6 threads, no GPU), making long videos computationally intensive. Performance will vary depending on hardware.
 - **Ball tracking:** Detection is not perfect and may occasionally miss shot attempts
 - **Single player:** The current pipeline is designed for one player at a time
 - **Fixed camera:** The camera must remain stationary throughout the recording
