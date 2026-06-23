@@ -45,20 +45,17 @@ Each detected trajectory is analyzed geometrically relative to the hoop position
 
 The final output is the original video annotated with the ball, hoop, player pose, and a live shot counter (made/total) overlaid in real time.
 
-
 ## Limitations
 
-Processing speed: Execution time is approximately 10× slower than real-time (1 minute of video takes ~10 minutes to process), making long videos computationally intensive
-Ball tracking: Detection is not perfect and may occasionally miss shot attempts
-Single player: The current pipeline is designed for one player at a time
-Fixed camera: The camera must remain stationary throughout the recording
+- **Processing speed:** Execution time is approximately 10× slower than real-time (1 minute of video takes ~10 minutes to process), making long videos computationally intensive
+- **Ball tracking:** Detection is not perfect and may occasionally miss shot attempts
+- **Single player:** The current pipeline is designed for one player at a time
+- **Fixed camera:** The camera must remain stationary throughout the recording
 
-## Future Work 
+## Future Work
 
--Multi-player detection : extend the pipeline to track and analyze multiple players simultaneously
--multiplayer detection
--Court calibration — automatically detect and map the court geometry to locat the shot
--Personalized shot feedback — provide detailed analysis on shot quality, ball arc height, body balance, and release mechanics
--Ultimate goal: data-driven shot optimization — store session data over time to identify shooting patterns and tendencies, then leverage extracted pose keypoints with machine learning to help players maximize their shooting percentage through personalized, data-backed recommendations
-
+- **Multi-player detection** — extend the pipeline to track and analyze multiple players simultaneously
+- **Court calibration** — automatically detect and map the court geometry to locate the shot
+- **Personalized shot feedback** — provide detailed analysis on shot quality, ball arc height, body balance, and release mechanics
+- **Ultimate goal: data-driven shot optimization** — store session data over time to identify shooting patterns and tendencies, then leverage extracted pose keypoints with machine learning to help players maximize their shooting percentage through personalized, data-backed recommendations
 
