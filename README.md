@@ -10,6 +10,11 @@ An end-to-end computer vision pipeline that takes raw basketball footage and aut
 ```bash
 git clone https://github.com/Mateo-LORENTE/Basketball_Shot_Understanding
 ```
+```bash
+cd Basketball_Shot_Understanding
+pip install -r requirements.txt
+```
+
 
 Drop your video into the `VID_IN/` folder, run 
 ```bash
